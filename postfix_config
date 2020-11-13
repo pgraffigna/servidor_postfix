@@ -1,0 +1,25 @@
+sudo apt install -y postfix s-nail libsasl2-2 ca-certificates libsasl2-modules mailutils
+
+editar /etc/postfix/main.cf
+- relayhost = [SMTP]:587
+- smtp_sasl_auth_enable = yes
+- smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
+- smtp_sasl_security_options = noanonymous
+- smtp_tls_CAfile = /etc/postfix/cacert.pem
+- smtp_use_tls = yes
+
+editar /etc/postfix/sasl_passwd
+[SMTP]:587 MAIL:PASSWORD
+
+chmod 600 /etc/postfix/sasl_passwd
+sudo postmap /etc/postfix/sasl_passwd
+chmod 600 /etc/postfix/sasl_passwd.db
+
+cat /etc/ssl/certs/thawte_Primary_Root_CA.pem | sudo tee -a /etc/postfix/cacert.pem
+sudo service postfix reload
+
+habilitar el uso de aplicaciones menos seguras (en caso de usar gmail como relay)
+https://myaccount.google.com/lesssecureapps
+
+echo "Probando postfix para usar con Nagios" | mail -s "notificación de prueba" MAIL_DESTINO
+
